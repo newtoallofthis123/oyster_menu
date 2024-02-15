@@ -1,0 +1,21 @@
+<?php
+
+namespace Oyster;
+
+require_once __DIR__ . '/support/lib/vendor/autoload.php';
+
+use Approach\Render\HTML;
+
+$webpage = new HTML(tag: 'html');
+$webpage->before = '<!DOCTYPE html>' . PHP_EOL;
+
+$head = new HTML(tag: 'head');
+$head[] =
+	$pageTitle = new HTML(tag: 'title', content: 'Oyster Testing');	
+
+$body = new HTML(tag: 'body', classes: ['Interface']);
+
+$menu = new HTML(tag: 'body');
+
+$webpage[] = $head;
+$webpage[] = $body;
