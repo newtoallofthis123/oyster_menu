@@ -33,10 +33,10 @@ use \Stringable;
  * @return Pearl
  * */
 class Pearl extends HTML
-{
+{   
     public HTML $visual;
     public HTML|string|Stringable $label;
-    public HTML $children;
+    public Stringable|HTML $children; // fixes it :0
 
     public function __construct(
         null|string|HTML|Stringable $visual = null,
@@ -63,6 +63,7 @@ class Pearl extends HTML
 
         // force the visual to be HTML
         if( !($visual instanceof HTML) ){
+            // If visual was simply blank, create default visual
             if ($visual === null) {
                 $visual = new HTML(tag: 'div');
                 $visual[] = new HTML(tag: 'i'); 
@@ -70,13 +71,18 @@ class Pearl extends HTML
                 $visual[] = $this->label = new HTML(tag: 'label', content: $label);
                 $visual[] = new HTML(tag: 'i', classes: ['fas', 'fa-angle-right']);
             }
+
+            // If visual was anything else besides blank or HTML use it as content
+            else{
+                $visual = new HTML('div', content: $visual); 
+            }
         }
         
         $this->nodes[] = $visual;
         $this->visual = &$this->nodes[0];
         $this->label = $label;
 
-        // Pattern Explaination
+        // Pattern Explanation
         // We first put all the nodes in an array
         // Then we use the array to create a reference to the nodes
         // So that the nodes can be accessed by reference
@@ -85,23 +91,15 @@ class Pearl extends HTML
 
         // We check if there are children
         // if not, we create an empty ul
+        $this->children = new HTML(tag: 'ul');
         if($children !== null &&count($children) > 0){
-            $this->children = new HTML(tag: 'ul');
             foreach ($children as $child) {
                 $this->children[$child->label] = $child;
             }
         } else {
-            // FIX: This outputs an unwanted <> tag
-            $this->children = new HTML(tag: null);
+            // if there are no children, we create an empty container
+            $this->children = new \Approach\Render\Container(); 
         }
-
-        $this->addChildren();
-    }
-
-    function addChildren() : self{
-        $this->nodes[] = $this->children;
-
-        return $this;
     }
 
     /**
@@ -114,7 +112,6 @@ class Pearl extends HTML
     public function addPearl(Pearl $pearl) : self{
         $this->children[$pearl->label] = $pearl;
         
-        $this->addChildren();
         return $this;
     }
 
@@ -136,9 +133,6 @@ class Pearl extends HTML
                 children: $pearl['children'] ?? null
             ));
         }
-        
-        $this->addChildren();
-
         return $this;
     }
     /**
