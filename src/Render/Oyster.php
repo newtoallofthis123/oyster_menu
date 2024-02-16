@@ -58,8 +58,8 @@ class Oyster extends HTML{
         public bool $prerender = false,
         public bool $selfContained = false,
     ){
-        $header = $header ?? new Header;  // uses default constructor, if these have required args fill them
-        $pearls = $pearls ?? new Pearl;   // uses default constructor, if these have required args fill them
+        $header = $header ?? new Header;  
+        $pearls = $pearls ?? new Pearl;   
 
         if($classes === null){
             $classes = [];

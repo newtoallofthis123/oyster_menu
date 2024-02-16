@@ -49,7 +49,7 @@ class Visual extends HTML{
         $classes = array_merge($classes, [' visual']);
 
         $icon = new HTML('i', classes: ['icon ', 'bi ', 'bi-list-check']);
-        $label = new HTML('label', content: 'Procedures');
+        $label = new HTML('label', content: $this->title);
         $expand = new HTML('i', classes: ['expand ', 'fa ', 'fa-angle-right']);
 
         parent::__construct(
@@ -57,6 +57,7 @@ class Visual extends HTML{
             id: $id,
             classes: $classes,
             attributes: $attributes,
+            // TODO: Concatenation to be converted to nodes and children
             content: $icon . $label . $expand . $content,
             styles: $styles,
             prerender: $prerender,

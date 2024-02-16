@@ -35,7 +35,7 @@ use \Stringable;
 class Pearl extends HTML
 {
     public HTML $visual;
-    public HTML $label;
+    public HTML|string|Stringable $label;
     public HTML $children;
 
     public function __construct(
@@ -66,17 +66,16 @@ class Pearl extends HTML
             if ($visual === null) {
                 $visual = new HTML(tag: 'div');
                 $visual[] = new HTML(tag: 'i'); 
-                $visual[] = $this->label = new HTML(tag: 'label', content: $label); // use internal label as fallback
+                // NOTE: The Label content may be used as a fallback
+                $visual[] = $this->label = new HTML(tag: 'label', content: $label);
                 $visual[] = new HTML(tag: 'i', classes: ['fas', 'fa-angle-right']);
-            }
-            else{
-                $visual = new HTML('div', content: $visual);
             }
         }
         
         $this->nodes[] = $visual;
         $this->visual = &$this->nodes[0];
-        
+        $this->label = $label;
+
         // Pattern Explaination
         // We first put all the nodes in an array
         // Then we use the array to create a reference to the nodes
@@ -91,10 +90,18 @@ class Pearl extends HTML
             foreach ($children as $child) {
                 $this->children[$child->label] = $child;
             }
-        }
-        else{
+        } else {
+            // FIX: This outputs an unwanted <> tag
             $this->children = new HTML(tag: null);
         }
+
+        $this->addChildren();
+    }
+
+    function addChildren() : self{
+        $this->nodes[] = $this->children;
+
+        return $this;
     }
 
     /**
@@ -106,6 +113,8 @@ class Pearl extends HTML
 
     public function addPearl(Pearl $pearl) : self{
         $this->children[$pearl->label] = $pearl;
+        
+        $this->addChildren();
         return $this;
     }
 
@@ -120,7 +129,6 @@ class Pearl extends HTML
      * @return self
      */
     public function populate(array $array) : self{
-        
         foreach($array as $pearl){
             $this->addPearl( new Pearl(
                 visual: $pearl['visual'],
@@ -129,9 +137,10 @@ class Pearl extends HTML
             ));
         }
         
+        $this->addChildren();
+
         return $this;
     }
-
     /**
      * Create a Pearl from an array
      * @param array<int,mixed> $array
