@@ -1,4 +1,5 @@
 <?php
+
 namespace Oyster\Render;
 
 require_once __DIR__ . '/../../support/lib/vendor/autoload.php';
@@ -32,11 +33,12 @@ use \Stringable;
  *
  * @return Pearl
  * */
+
 class Pearl extends HTML
-{   
+{
     public HTML $visual;
     public HTML|string|Stringable $label;
-    public Stringable|HTML $children; // fixes it :0
+    public Stringable|HTML $children;
 
     public function __construct(
         null|string|HTML|Stringable $visual = null,
@@ -62,22 +64,22 @@ class Pearl extends HTML
         );
 
         // force the visual to be HTML
-        if( !($visual instanceof HTML) ){
+        if (!($visual instanceof HTML)) {
             // If visual was simply blank, create default visual
             if ($visual === null) {
                 $visual = new HTML(tag: 'div');
-                $visual[] = new HTML(tag: 'i'); 
+                $visual[] = new HTML(tag: 'i');
                 // NOTE: The Label content may be used as a fallback
                 $visual[] = $this->label = new HTML(tag: 'label', content: $label);
                 $visual[] = new HTML(tag: 'i', classes: ['fas', 'fa-angle-right']);
             }
 
             // If visual was anything else besides blank or HTML use it as content
-            else{
-                $visual = new HTML('div', content: $visual); 
+            else {
+                $visual = new HTML('div', content: $visual);
             }
         }
-        
+
         $this->nodes[] = $visual;
         $this->visual = &$this->nodes[0];
         $this->label = $label;
@@ -91,14 +93,14 @@ class Pearl extends HTML
 
         // We check if there are children
         // if not, we create an empty ul
-        $this->children = new HTML(tag: 'ul');
-        if($children !== null &&count($children) > 0){
+        if ($children !== null && count($children) > 0) {
+            $this->children = new HTML(tag: 'ul');
             foreach ($children as $child) {
-                $this->children[$child->label] = $child;
+                $this->children->nodes[$child->label] = $child;
             }
         } else {
             // if there are no children, we create an empty container
-            $this->children = new \Approach\Render\Container(); 
+            $this->children = new \Approach\Render\Container();
         }
     }
 
@@ -109,9 +111,15 @@ class Pearl extends HTML
      * @return self
      */
 
-    public function addPearl(Pearl $pearl) : self{
-        $this->children[$pearl->label] = $pearl;
+    public function addPearl(Pearl $pearl): self
+    {
+        if(!($this->children instanceof \Approach\Render\HTML)){    
+            
+            $this->children = new HTML(tag: 'ul');
+        }
         
+        $this->children[$pearl->label] = $pearl;
+
         return $this;
     }
 
@@ -125,9 +133,10 @@ class Pearl extends HTML
      *          children: array | null
      * @return self
      */
-    public function populate(array $array) : self{
-        foreach($array as $pearl){
-            $this->addPearl( new Pearl(
+    public function populate(array $array): self
+    {
+        foreach ($array as $pearl) {
+            $this->addPearl(new Pearl(
                 visual: $pearl['visual'],
                 label: $pearl['label'],
                 children: $pearl['children'] ?? null
@@ -139,7 +148,8 @@ class Pearl extends HTML
      * Create a Pearl from an array
      * @param array<int,mixed> $array
      */
-    public static function fromArray(array $array) : self{
+    public static function fromArray(array $array): self
+    {
         return (new Pearl)->populate($array);
     }
 }

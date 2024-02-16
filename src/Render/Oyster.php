@@ -12,16 +12,21 @@ use \Stringable;
 /* 
  * Oyster
  *
- * The Oyster is the sole representation of the Oyster Menu. It is responsible for holding and rendering the header, pearls, and shell
- * It is a subclass of the HTML class and has various checks and so for the content and classes
+ * The Oyster is the sole representation of the Oyster Menu. It is responsible 
+ * for holding and rendering the header, pearls, and shell
+ * It is a subclass of the HTML class and has various checks and so for 
+ * the content and classes
  *
  * ## Explanation
  *
- * - Header: The header is the top section of the Oyster and is used to hold the dynamic pearl menu and the signout button
- * - Pearl: A Pearl is a self expanding list item that can be used to create a visual representation of a list in a Oyster
+ * - Header: The header is the top section of the Oyster and is used to hold 
+ * the dynamic pearl menu and the signout button
+ * - Pearl: A Pearl is a self expanding list item that can be used to create a 
+ * visual representation of a list in a Oyster
  * - Shell: The shell is the toolbar that holds the pearls
  *
- * The Oyster Menu is expandable while providing all the necessary integrity checks.
+ * The Oyster Menu is expandable while providing all the necessary integrity 
+ * checks.
  * 
  * @see Header
  * @see Pearl
@@ -79,15 +84,16 @@ class Oyster extends HTML{
         $this->header = &$this->nodes[0];
 
         // Add shell to the Oyster 
-        $this->shell = new HTML(tag: 'ul', classes: ['Shell ', 'Toolbar']);
+        $this->shell = new HTML(tag: 'ul', classes: ['Shell', 'Toolbar']); 
         $this->pearls = $pearls;
 
         // Add pearls to the shell
         $index = count($this->shell); 
         $this->shell[] = $pearls;
-        foreach($pearls->children as $pearl){ 
+        foreach($this->pearls->children as $pearl){ 
             $this->shell[] = $pearl;
             $this->pearls[ $pearl->label ] = $this->shell->nodes[$index];
+            print_r($pearl->render());
             $index++;
         }
         $this->nodes[] = $this->shell;

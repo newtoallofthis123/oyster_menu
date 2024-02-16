@@ -18,12 +18,15 @@ $newHeader = new Header(crumbs: ['Home', 'About', 'Contact']);
 
 $visual = new Visual(title: 'Wow');
 $otherVisual = new Visual(title: 'Cool');
+$coolVisual = new Visual(title: 'Nice');
 
 $list1 = new Pearl(visual: $visual, label: 'List 1');
+$list2 = new Pearl(visual: $coolVisual, label: 'List 2');
 
 $wow = new Pearl(visual: $otherVisual, label: 'Wow');
 
 $list1->addPearl($wow);
+$list1->addPearl($list2);
 
 $oyster = new Oyster(header: $newHeader, pearls: $list1);
 
