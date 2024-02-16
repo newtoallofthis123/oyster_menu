@@ -25,9 +25,7 @@ $wow = new Pearl(visual: $otherVisual, label: 'Wow');
 
 $list1->addPearl($wow);
 
-
 $oyster = new Oyster(header: $newHeader, pearls: $list1);
-print_r($oyster->pearls->render());
 
 $new[] = $oyster;
 echo $webpage->render();

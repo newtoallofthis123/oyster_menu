@@ -79,16 +79,17 @@ class Oyster extends HTML{
         $this->header = &$this->nodes[0];
 
         // Add shell to the Oyster 
-        $shell = new HTML(tag: 'ul', classes: ['Shell ', 'Toolbar']);
-        $this->header->nodes[] = $shell;
-        $this->shell = &$this->header->nodes[0];
+        $this->shell = new HTML(tag: 'ul', classes: ['Shell ', 'Toolbar']);
+        $this->pearls = $pearls;
 
         // Add pearls to the shell
         $index = count($this->shell); 
-        foreach($pearls as $pearl){ 
+        $this->shell[] = $pearls;
+        foreach($pearls->children as $pearl){ 
             $this->shell[] = $pearl;
             $this->pearls[ $pearl->label ] = $this->shell->nodes[$index];
             $index++;
-        }        
+        }
+        $this->nodes[] = $this->shell;
     }
 } 
