@@ -4,6 +4,7 @@ namespace Oyster\Render;
 
 require_once __DIR__ . '/../../support/lib/vendor/autoload.php';
 
+use Approach\Render\Container;
 use \Approach\Render\HTML;
 use \Approach\Render\Node;
 use \Approach\Render\Stream;
@@ -38,12 +39,16 @@ class Pearl extends HTML
 {
     public HTML $visual;
     public HTML|string|Stringable $label;
-    public Stringable|HTML $children;
+    // The array|Container is used to represent the empty state
+    // cause HTML doesn't consider null values
+    // This is cause we wouldn't want blank ul's that are
+    // uninitialized
+    public null|array|Container|HTML $children;
 
     public function __construct(
         null|string|HTML|Stringable $visual = null,
         null|string|HTML|Stringable $label = null,
-        null|Pearl $children = null,
+        null|array|Container $children = null,
 
         public null|string|Stringable $id = null,
         null|string|array|Node|Attribute $classes = null,
@@ -57,7 +62,7 @@ class Pearl extends HTML
             tag: 'li',
             id: $id,
             classes: $classes,
-            attributes: new Attribute('data-pearl', $label), // We feed in the label as the data-pearl attribute
+            attributes: new Attribute('data-pearl', $label), 
             styles: $styles,
             prerender: $prerender,
             selfContained: $selfContained
@@ -83,25 +88,20 @@ class Pearl extends HTML
         $this->nodes[] = $visual;
         $this->visual = &$this->nodes[0];
         $this->label = $label;
-
-        // Pattern Explanation
-        // We first put all the nodes in an array
-        // Then we use the array to create a reference to the nodes
-        // So that the nodes can be accessed by reference
-        // making it easier to manipulate the nodes
-        // and acting as a sort of integrity check
-
-        // We check if there are children
-        // if not, we create an empty ul
-        if ($children !== null && count($children) > 0) {
-            $this->children = new HTML(tag: 'ul');
+        
+        if ($children !== null) {
+            $this->children = new HTML(tag: 'ul', classes: ['Pearl']);
+            $index = count($this->nodes);
             foreach ($children as $child) {
-                $this->children->nodes[$child->label] = $child;
+                $this->children[$child->label] = $child;
             }
         } else {
             // if there are no children, we create an empty container
             $this->children = new \Approach\Render\Container();
         }
+
+        $this->nodes[] = $this->children;
+        $this->children = &$this->nodes[count($this->nodes) - 1];
     }
 
     /**
@@ -110,7 +110,6 @@ class Pearl extends HTML
      * @param Pearl $pearl The pearl to add
      * @return self
      */
-
     public function addPearl(Pearl $pearl): self
     {
         if(!($this->children instanceof \Approach\Render\HTML)){    
@@ -137,7 +136,9 @@ class Pearl extends HTML
     {
         foreach ($array as $pearl) {
             $this->addPearl(new Pearl(
-                visual: $pearl['visual'],
+                // can be visual, but need not be
+                visual: $pearl['visual'] instanceof HTML 
+                    ? $pearl['visual'] : new Visual(title: $pearl['visual']) , 
                 label: $pearl['label'],
                 children: $pearl['children'] ?? null
             ));
