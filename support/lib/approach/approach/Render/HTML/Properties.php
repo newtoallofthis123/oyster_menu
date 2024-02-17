@@ -44,6 +44,7 @@ trait Properties
             $this->before .
             '<' .
             $this->tag .
+            ($this->id ? ' id="' . $this->id . '"' : '') .
 			(count($this->classes->nodes) > 0 ? ' class="' .$this->classes.'"' : '') .
             $this->attributes .
             $this->BuildStyles() .

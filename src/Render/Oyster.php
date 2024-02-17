@@ -3,6 +3,7 @@ namespace Oyster\Render;
 
 require_once __DIR__ . '/../../support/lib/vendor/autoload.php';
 
+use Approach\Render\Container;
 use \Approach\Render\HTML;
 use \Approach\Render\Node;
 use \Approach\Render\Stream;
@@ -29,11 +30,10 @@ use \Stringable;
  * checks.
  * 
  * @see Header
- * @see Pearl
  * @see HTML
  *
  * @param Header|null $header - the header of the oyster
- * @param Pearl|null $pearls - the pearls of the oyster
+ * @param null|array|Container $pearls - the pearls of the oyster
  *
  * @param string|null $id - the id of the oyster
  * @param string|array|Node|Attribute|null $classes - the classes of the oyster
@@ -48,12 +48,11 @@ use \Stringable;
  * */
 class Oyster extends HTML{
     public ?Header $header;
-    public ?Pearl $pearls;
     public HTML $shell;
     
     public function __construct(
         null|Header $header = null,
-        null|Pearl $pearls = null,
+        null|array|Container $pearls = null,
 
         public null|string|Stringable $id = null,
         null|string|array|Node|Attribute $classes = null,
@@ -64,7 +63,6 @@ class Oyster extends HTML{
         public bool $selfContained = false,
     ){
         $header = $header ?? new Header;  
-        $pearls = $pearls ?? new Pearl;   
 
         if($classes === null){
             $classes = [];
@@ -84,18 +82,10 @@ class Oyster extends HTML{
         $this->header = &$this->nodes[0];
 
         // Add shell to the Oyster 
-        $this->shell = new HTML(tag: 'ul', classes: ['Shell', 'Toolbar']); 
-        $this->pearls = $pearls;
-
-        // Add pearls to the shell
-        $index = count($this->shell); 
-        $this->shell[] = $pearls;
-        foreach($this->pearls->children as $pearl){ 
-            $this->shell[] = $pearl;
-            $this->pearls[ $pearl->label ] = $this->shell->nodes[$index];
-            print_r($pearl->render());
-            $index++;
-        }
+        $this->shell = new HTML(tag: 'ul', classes: ['Shell ', 'Toolbar']); 
+        foreach($pearls as $pearl){ 
+            $this->shell[$pearls->label] = $pearl;
+        }        
         $this->nodes[] = $this->shell;
     }
 } 
